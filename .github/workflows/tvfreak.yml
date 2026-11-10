@@ -1,0 +1,85 @@
+# Compila tu versión de Nuvio conectada a TVFREAK y la publica como "release" en tu GitHub.
+# Va en tu copia de NuvioTV, en: .github/workflows/tvfreak.yml
+# Se lanza a mano: pestaña Actions > "TVFREAK - compilar app" > Run workflow.
+
+name: TVFREAK - compilar app
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  # Dirección de tu worker de Cloudflare (termina en /)
+  TVFREAK_URL: https://tvfreak-stremio.lastonteridas.workers.dev/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Preparar Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Configurar TVFREAK
+        env:
+          KEYSTORE_B64: ${{ secrets.TVFREAK_KEYSTORE_BASE64 }}
+          KEY_PASSWORD: ${{ secrets.TVFREAK_KEY_PASSWORD }}
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${KEYSTORE_B64}" || -z "${KEY_PASSWORD}" ]]; then
+            echo "Faltan los secretos TVFREAK_KEYSTORE_BASE64 y/o TVFREAK_KEY_PASSWORD." >&2
+            exit 1
+          fi
+          keystore="${RUNNER_TEMP}/tvfreak.jks"
+          printf '%s' "${KEYSTORE_B64}" | base64 --decode > "${keystore}"
+
+          {
+            echo "TRAKT_API_URL=${TVFREAK_URL}trakt/"
+            echo "TRAKT_CLIENT_ID=tvfreak"
+            echo "TRAKT_CLIENT_SECRET=tvfreak"
+            echo "TMDB_API_KEY=${TMDB_API_KEY}"
+            echo "NUVIO_RELEASE_STORE_FILE=${keystore}"
+            echo "NUVIO_RELEASE_KEY_ALIAS=tvfreak"
+            echo "NUVIO_RELEASE_KEY_PASSWORD=${KEY_PASSWORD}"
+            echo "NUVIO_RELEASE_STORE_PASSWORD=${KEY_PASSWORD}"
+          } > local.properties
+
+          # El actualizador de la app mira tus versiones, no las oficiales
+          sed -i -E 's/("GITHUB_OWNER", "\\")NuvioMedia(\\"")/\1${{ github.repository_owner }}\2/' app/build.gradle.kts
+          grep -n 'GITHUB_OWNER' app/build.gradle.kts
+
+          # Número de versión propio y creciente, para que la tele acepte cada actualización
+          run="${{ github.run_number }}"
+          base=$(grep -oE 'versionName = "[0-9]+\.[0-9]+' app/build.gradle.kts | grep -oE '[0-9]+\.[0-9]+$')
+          version="${base}.$((1000 + run))"
+          sed -i -E "s/versionCode = [0-9]+/versionCode = $((100000 + run))/; s/versionName = \"[^\"]+\"/versionName = \"${version}\"/" app/build.gradle.kts
+          grep -nE 'versionCode =|versionName =' app/build.gradle.kts
+          echo "TVFREAK_VERSION=${version}" >> "${GITHUB_ENV}"
+
+      - name: Compilar
+        run: ./gradlew :app:assembleFullRelease --stacktrace
+
+      - name: Publicar la versión
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mapfile -t apks < <(find app/build/outputs/apk/full/release -maxdepth 1 -name '*.apk' | sort)
+          if (( ${#apks[@]} == 0 )); then echo "No se generó ningún APK." >&2; exit 1; fi
+          tag="v${TVFREAK_VERSION}"
+          gh release create "${tag}" "${apks[@]}" --title "TVFREAK ${TVFREAK_VERSION}" \
+            --notes "Versión de Nuvio conectada a TVFREAK. Para instalar en la tele, usa el APK que termina en armeabi-v7a o arm64-v8a (o el universal)." --latest
