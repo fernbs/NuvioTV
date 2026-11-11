@@ -118,7 +118,8 @@ internal fun TraktAccountDialog(
             suppressFirstKeyUp = false
         ) {
             val displayUrl = state.verificationUrl ?: TRAKT_ACTIVATION_URL
-            val qrUrl = state.deviceUserCode?.let { "$TRAKT_ACTIVATION_URL/$it" } ?: displayUrl
+            // TVFREAK: el QR usa la dirección que devuelve el servidor (tu worker), no trakt.tv
+            val qrUrl = state.deviceUserCode?.let { "${displayUrl.trimEnd('/')}/$it" } ?: displayUrl
             TrackingDeviceAuthContent(
                 providerName = stringResource(R.string.trakt_name),
                 logo = logo,
