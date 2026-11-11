@@ -42,6 +42,10 @@ Propuesta v0.3.1 (pendiente de tu OK):
 
 **Worker:** bloqueo del código tras 5 PIN fallidos en `/activate`.
 
+**Filas del addon (11 nov):** Series viendo, Series pendientes (apuntadas sin ningún capítulo visto), Al día, Series vistas, Películas viendo (a medias en la tele, la web no tiene ese estado), Películas pendientes, Películas vistas, más Sugerencias, Para volver a ver y Abandonadas. El orden y las filas ocultas se eligen en la tele: Ajustes > Addons > "Reordenar catálogos del inicio". Índices en `watchedEpisodes(watchedAt)` y `movies(status, updatedAt)` para no agotar las lecturas gratis de D1.
+
+**Listas propias (pendiente, chat nuevo):** el worker implementa la parte de listas de Trakt (`users/{id}/lists` y sus `items`) con tablas propias en D1, para que "Crear lista" y "Añadir a lista" de Nuvio funcionen, y publica cada lista como una fila más del addon para que salga en el Inicio.
+
 **Ajustes en la tele (sin código):** apagar los comentarios (el worker no devuelve reseñas), MDBList con clave propia y "mostrar en el hero" activado, estilo "CARD" en Seguir viendo.
 
 **Pendiente apuntado:** el worker rellenaba `imdbRating` con la nota de TMDB en las sugerencias (`worker.js:183`). Arreglado en local el 11 nov (se quita el campo), falta desplegar. Ojo: la web TVFREAK también guarda la nota de TMDB en la columna `imdbRating` de las series, así que las filas de biblioteca del addon la siguen mandando como IMDb. IntroDB y cuenta Nuvio no se activan (sus claves no son públicas).
