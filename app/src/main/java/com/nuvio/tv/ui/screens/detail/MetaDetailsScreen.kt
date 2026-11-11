@@ -2550,7 +2550,7 @@ private fun MetaDetailsContent(
             val showEpisodesRow = isSeries && seasons.isNotEmpty()
             if (showSeasonTabs) {
                 item(key = "season_tabs", contentType = "season_tabs") {
-                    Box(modifier = Modifier.bringIntoViewResponder(detailRowBringIntoViewResponder)) {
+                    Column(modifier = Modifier.bringIntoViewResponder(detailRowBringIntoViewResponder)) { // TVFREAK: Column en vez de Box, para poner el contador debajo de las pestañas
                         SeasonTabs(
                             seasons = seasons,
                             selectedSeason = selectedSeason,
@@ -2561,6 +2561,7 @@ private fun MetaDetailsContent(
                             downFocusRequester = seasonDownFocusRequester,
                             isFocusEnabled = pendingRestoreType != RestoreTarget.EPISODE
                         )
+                        com.nuvio.tv.ui.screens.home.tvfreak.TvfreakSeasonProgress(episodesForSeason, watchedEpisodes, episodeProgressMap) // TVFREAK: contador "3 de 10 vistos"
                     }
                 }
             }

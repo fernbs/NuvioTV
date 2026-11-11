@@ -85,4 +85,5 @@
     <string name="trakt_comments_error_request_failed">Error en la solicitud de comentarios de TVFREAK</string>
     <string name="trakt_awaiting_instruction">Escanea el QR o ve a la dirección de abajo e introduce este código:</string>
     <string name="trakt_status_enter_activation_code">Introduce el código en la página de activación de TVFREAK</string>
+    <string name="tvfreak_season_watched_count">%1$d de %2$d vistos</string>
 </resources>

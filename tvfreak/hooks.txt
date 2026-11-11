@@ -1,0 +1,6 @@
+# Enganches // TVFREAK en archivos de Nuvio: <número esperado> <ruta desde app/src/main/java/com/nuvio/tv/>
+# Si añades o quitas un enganche, cambia esta lista en el mismo commit.
+1 ui/screens/home/HomeViewModelPresentationPipeline.kt
+1 ui/screens/home/ModernHomeRows.kt
+1 ui/screens/settings/TrackingProviderDialogs.kt
+2 ui/screens/detail/MetaDetailsScreen.kt

@@ -32,6 +32,10 @@ Enganche extra (probado en la tele que hacía falta): Modern no rehace las tarje
 
 **Ficha (Fase 3):** sin copia de `MetaDetailsContent`. Como mucho 2 o 3 enganches (contador "3 de 10 vistos", botón de marcar temporada), a decidir con la tele delante.
 
+Propuesta v0.3.1 (pendiente de tu OK):
+- Contador "3 de 10 vistos" debajo de las pestañas de temporada: `ui/screens/home/tvfreak/TvfreakSeasonProgress.kt` (nuevo, sin foco), dentro del `item` `season_tabs` de `MetaDetailsScreen.kt`: el `Box` pasa a `Column` y se añade la llamada debajo de `SeasonTabs`, dos líneas `// TVFREAK`. No va como `item` aparte porque Nuvio calcula a mano la posición de la fila de capítulos (`episodeListItemIndex`). Cuenta igual que Nuvio en `isSeasonFullyWatched`: visto en `watchedEpisodes` o progreso completado. Texto en `app/src/full/res` (`values` y `values-es`).
+- Botón de marcar temporada: no se añade. Nuvio ya lo hace con mantener OK en la pestaña de la temporada y en el menú de cada capítulo. Un botón entre las pestañas y los capítulos rompe el paso con el mando (Abajo salta de las pestañas a los capítulos), y arreglarlo pide más enganches en el foco.
+
 **Textos e imágenes:** van en `app/src/full/res/` (el flavor que compilamos), que pisa a `main`. `app/src/main/res` vuelve a estar como en upstream. Solo `values` y `values-es`. Se arreglan también `trakt_awaiting_instruction` y `trakt_status_enter_activation_code`, que mandaban a trakt.tv. Se sustituyen el logo y el splash de Nuvio (`app_logo_wordmark*.png`, `app_logo_mark.png`).
 
 **Workflow:** activar Dolby Vision perfil 7 (`DOVI_*` como en `local.example.properties`), saltar lint vital en el release, y que los `sed` fallen si no encuentran la línea.
@@ -40,9 +44,9 @@ Enganche extra (probado en la tele que hacía falta): Modern no rehace las tarje
 
 **Ajustes en la tele (sin código):** apagar los comentarios (el worker no devuelve reseñas), MDBList con clave propia y "mostrar en el hero" activado, estilo "CARD" en Seguir viendo.
 
-**Pendiente apuntado:** el worker rellena `imdbRating` con la nota de TMDB en las sugerencias (`worker.js:183`). IntroDB y cuenta Nuvio no se activan (sus claves no son públicas).
+**Pendiente apuntado:** el worker rellenaba `imdbRating` con la nota de TMDB en las sugerencias (`worker.js:183`). Arreglado en local el 11 nov (se quita el campo), falta desplegar. Ojo: la web TVFREAK también guarda la nota de TMDB en la columna `imdbRating` de las series, así que las filas de biblioteca del addon la siguen mandando como IMDb. IntroDB y cuenta Nuvio no se activan (sus claves no son públicas).
 
-**Actualizaciones de Nuvio:** merge semanal de `upstream/dev` (no rebase), con `rerere` activado, y tras cada merge contar los `// TVFREAK` para comprobar que no se ha perdido ningún enganche.
+**Actualizaciones de Nuvio:** merge semanal de `upstream/dev` (no rebase), con `rerere` activado, y tras cada merge contar los `// TVFREAK` para comprobar que no se ha perdido ningún enganche. Lo hace `tvfreak/upstream-merge.sh`, que comprueba cada archivo de `tvfreak/hooks.txt` y que `app/src/main/res` sigue igual que en upstream. No sube nada: el push y la compilación se piden aparte.
 
 ---
 
