@@ -1,6 +1,6 @@
 # TVFREAK dentro de NuvioTV: especificación
 
-Versión 0.1, 11 nov 2026. Borrador para aprobar. Fork `fernbs/NuvioTV`, rama `dev`.
+Versión 0.2, 11 nov 2026. Aprobada, con colores y menús siempre desde los ajustes de Nuvio. Fork `fernbs/NuvioTV`, rama `dev`.
 Diseño de referencia: artifact "Mi Nuvio con TVFREAK" (Inicio, menú de Seguir viendo, Ficha).
 
 Rutas de código: todo cuelga de `app/src/main/java/com/nuvio/tv/`.
@@ -13,6 +13,7 @@ Rutas de código: todo cuelga de `app/src/main/java/com/nuvio/tv/`.
 2. Solo se cambia cómo se ve y cómo se organiza. Los datos y las acciones son siempre los de Nuvio (sus ViewModel, repositorios y callbacks).
 3. Lo nuevo va en archivos nuevos con prefijo `Tvfreak`, en el paquete `ui/screens/home/tvfreak/` (y `ui/screens/detail/tvfreak/` si llega la Fase 3). Los archivos de Nuvio solo se tocan en las líneas listadas en la sección 6.
 4. Todo lo que se pueda resolver con un ajuste dentro de la app no se programa.
+5. Los ajustes de Nuvio mandan. El diseño TVFREAK no fija colores ni menús: usa el tema que elijas en la app (incluido el Personalizado), la barra lateral que elijas (por ejemplo la moderna, flotante y oculta) y el resto de opciones de Nuvio. Solo cambia la colocación y la forma de los elementos. Las únicas excepciones son los colores de marca de IMDb (amarillo) y Rotten Tomatoes (rojo y verde) en las notas.
 
 ---
 
@@ -43,7 +44,7 @@ Coste: unas 25 líneas en 4 archivos de Nuvio, frente a unas 60 en 12 archivos c
 | Hero (fondo, logo, sinopsis, año, géneros) | `ModernHomePresentationState` + `enrichedPreviews` | Meta del addon, enriquecida con TMDB |
 | Notas IMDb y RT | `MetaPreview.mdbListRatings` (filas) y `HeroPreview` / `mdbListRatings` (hero) | MDBList, con tu clave. Ver sección 5 |
 | Progreso de un capítulo | `ContinueWatchingItem.InProgress` (posición y duración) | Tu worker vía Trakt |
-| Colores | `NuvioTheme` (tema CUSTOM) más nuestro `TvfreakTokens.kt` | Fijos: fondo #0d0f14, panel #171a22, foco #8b7bff, nuevo #3fd0c9 |
+| Colores | `NuvioTheme.colors` (fondo, superficies, texto, acento) y `NuvioTheme.focusRing` (marco de foco) | El tema que elijas en los ajustes de Nuvio. Nada fijo en nuestro código salvo IMDb y RT |
 
 Requisito de uso, no de código: tu addon TVFREAK tiene que estar instalado en Nuvio por su URL de manifiesto para que salgan "Sugerencias para ti" y "Para volver a ver". **Pendiente de confirmar que lo está.**
 
@@ -64,16 +65,17 @@ Requisito de uso, no de código: tu addon TVFREAK tiene que estar instalado en N
 |---|---|---|
 | Hero arriba, ocupando el 54% de la pantalla, degradado oscuro abajo | Copia de `ModernHomeHero.kt` con nuevas medidas y degradado | Igual que Modern |
 | Antetítulo "Capítulo nuevo el 12 nov" en verde azulado | Nuevo. Solo si el elemento enfocado tiene un capítulo próximo o recién salido | `upcomingItems` y `ContinueWatchingItem.NextUp` (fecha de emisión) |
-| Título grande en Space Grotesk | Se usa el logo si existe, como Modern. Si no, el título en Space Grotesk | `HeroPreview.logo` / `title` |
+| Título grande | Se usa el logo si existe, como Modern. Si no, el título con la fuente que elijas en los ajustes de Nuvio | `HeroPreview.logo` / `title` |
 | Notas grandes: IMDb y Rotten Tomatoes | Componente nuevo `TvfreakRatingBadges` (grande) | `mdbListRatings.imdb` y `.tomatoes` |
 | Sinopsis, máximo 3 líneas | Igual que Modern | `HeroPreview.description` |
 | Botones "Ver T1 · E5" y "Ficha" | **Propongo quitarlos.** El hero cambia con el foco, así que llegar a sus botones con el mando obliga a subir y pierde el elemento. OK y mantener OK ya hacen lo mismo desde la tarjeta | - |
-| Barra superior "Inicio · Buscar · Biblioteca · Ajustes" | **Propongo mantener la barra lateral de Nuvio.** Ponerla arriba obliga a tocar `MainActivity.kt` (2.000+ líneas compartidas por todas las pantallas). La barra lateral flotante "moderna" de Nuvio ya se parece | Nuvio |
+| Barra superior "Inicio · Buscar · Biblioteca · Ajustes" | **Se usa la barra lateral de Nuvio, la que elijas en sus ajustes** (ahora tienes la moderna, flotante y oculta). No se toca `MainActivity.kt` | Ajustes de Nuvio |
 | Fila "Seguir viendo · desde TVFREAK" | Encabezado con título y subtítulo pequeño en gris | Fija |
 | Tarjeta de Seguir viendo 16:9 | Componente nuevo `TvfreakContinueWatchingCard`: imagen, degradado, título, línea "T3 · E4 · quedan 22 min", barra de progreso blanca, chip "Nuevo" arriba a la izquierda, notas arriba a la derecha | Imagen del capítulo o fondo de la serie. Minutos restantes = duración menos posición. "Nuevo" si es `NextUp` emitido hace 7 días o menos |
 | Filas de pósters 2:3 con nombre de la fila y "tu addon" | Copia de la fila de Modern con pósters verticales y subtítulo con el nombre del addon | `catalogRows` |
 | Notas pequeñas en cada póster (IMDb amarillo, RT rojo), siempre visibles | Componente `TvfreakRatingBadges` (pequeño) | `MetaPreview.mdbListRatings`. Nuvio ya las pide por lotes para la fila enfocada y la siguiente. Las filas lejanas se rellenan al acercarte |
-| Foco: marco morado #8b7bff y escala 1,04 | En nuestras tarjetas, fijo desde `TvfreakTokens` | - |
+| Foco: marco de color y escala 1,04 | El marco usa `NuvioTheme.focusRing`, es decir, el color del tema que elijas. La escala y el estilo de tarjeta respetan los ajustes de tarjetas de Nuvio cuando existen | Tema de Nuvio |
+| Antetítulo y chip "Nuevo" | Color de acento del tema, no un verde fijo | Tema de Nuvio |
 
 ### Lo que se mantiene igual que Modern (para no quedar por debajo)
 
@@ -93,7 +95,7 @@ Carga de filas al bajar, guardado y recuperación del foco al volver de una fich
 | Quitar (borra el progreso) | Sí. Va a `DELETE sync/playback/<id>` de tu worker |
 | (no está en el diseño) | "Reproducir manualmente", para elegir fuente. Se queda, es una función más |
 
-Diferencias visuales: Nuvio no pone el subtítulo gris bajo cada opción ("vuelve a 0:00"). Con el tema morado el foco ya sale morado. Para añadir los subtítulos habría que tocar el componente compartido o copiarlo. No compensa, propongo dejarlo.
+Diferencias visuales: Nuvio no pone el subtítulo gris bajo cada opción ("vuelve a 0:00"). El foco sale del color de tu tema. Para añadir los subtítulos habría que tocar el componente compartido o copiarlo. No compensa, propongo dejarlo.
 
 ---
 
@@ -135,7 +137,7 @@ Nota: la clave de MDBList la escribes tú en la tele. No me la pegues en el chat
 - **Camino recomendado:** un único `if` en `MetaDetailsScreen.kt` que llama a `TvfreakMetaDetailsContent` en lugar de `MetaDetailsContent`, con los mismos parámetros. Reutilizamos todo el pegamento. Pero las funciones auxiliares privadas de ese archivo hay que copiarlas a nuestro archivo, y `MetaDetailsScreen.kt` es uno de los archivos que Nuvio cambia más a menudo. Si Nuvio añade un parámetro, nuestra copia deja de compilar hasta que la ajustemos (es un aviso claro, no un fallo silencioso).
 - Tamaño: parecido al Inicio, en torno a 2.000 líneas copiadas y ajustadas.
 
-**Recomendación:** no prometo la Fase 3 hasta ver la Fase 2 en la tele. Con el tema morado y las notas MDBList activas, la Ficha de Nuvio ya se acerca bastante a tu diseño. Decidimos con la tele delante.
+**Recomendación:** no prometo la Fase 3 hasta ver la Fase 2 en la tele. Con tu tema y las notas MDBList activas, la Ficha de Nuvio ya se acerca bastante a tu diseño. Decidimos con la tele delante.
 
 ---
 
@@ -150,7 +152,7 @@ Nota: la clave de MDBList la escribes tú en la tele. No me la pegues en el chat
 | Textos "Trakt" a "TVFREAK" | 89 textos en `values` y 89 en `values-es` | Sustitución revisada a mano (hay frases que hablan de Trakt como servicio, se revisan una a una) |
 | QR | `TrackingProviderDialogs.kt:121` | El QR usa la dirección que devuelve el worker (`<worker>/activate/<código>`), no `trakt.tv` |
 | Ruta `/activate/<código>` | `stremio-addon/worker.js` | Abre la página de activación con el código ya escrito. Solo falta el PIN |
-| Tema | Ajuste en la tele | Tema "Personalizado" de los ajustes de la app, con #8b7bff en los tres huecos (el foco usa el más claro). Sin código |
+| Tema | Ajuste en la tele | El que elijas entre los de Nuvio o el Personalizado. Sin código |
 
 Despliegue: commit y push al fork (te aviso antes), lanzar el workflow, desplegar el worker con wrangler (te aviso antes).
 
@@ -169,7 +171,7 @@ Despliegue: commit y push al fork (te aviso antes), lanzar el workflow, desplega
 | `res/values/strings.xml`, `values-es` | 2 textos del interruptor | 2 |
 | `ui/screens/detail/MetaDetailsScreen.kt` | 1 `if` | 3, si se aprueba |
 
-Archivos nuevos (solo nuestros): `ui/screens/home/tvfreak/TvfreakHomeContent.kt`, `TvfreakHomeHero.kt`, `TvfreakHomeRows.kt`, `TvfreakHomeRowsList.kt`, `TvfreakTokens.kt`, `TvfreakRatingBadges.kt`, `TvfreakContinueWatchingCard.kt`, y las fuentes Space Grotesk e Inter en `res/font`.
+Archivos nuevos (solo nuestros): `ui/screens/home/tvfreak/TvfreakHomeContent.kt`, `TvfreakHomeHero.kt`, `TvfreakHomeRows.kt`, `TvfreakHomeRowsList.kt`, `TvfreakRatingBadges.kt`, `TvfreakContinueWatchingCard.kt`. Sin fuentes propias: se usa la que elijas en Nuvio.
 
 Se reutilizan sin copiar: `ModernHomeModels.kt` y `ModernHomePresentation.kt` (los datos ya llegan preparados para todas las disposiciones).
 
@@ -179,4 +181,3 @@ Se reutilizan sin copiar: `ModernHomeModels.kt` y `ModernHomePresentation.kt` (l
 
 - **Actualizaciones de Nuvio.** Nuestra copia no recibe los arreglos que Nuvio haga en la vista Modern. Al actualizar, reviso los cambios de `ModernHome*.kt` y paso a mano los que importen.
 - **Compilar sin Android en local.** Cada error de Kotlin cuesta una vuelta de 15 a 30 minutos en GitHub. Para reducirlo, antes de cada compilación reviso a mano firmas e imports, y la Fase 2 va en una sola tanda.
-- **Fuentes.** Space Grotesk e Inter son libres (OFL), van dentro del APK.
