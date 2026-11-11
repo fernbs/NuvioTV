@@ -349,7 +349,7 @@ internal fun HomeViewModel.observeModernHomePresentationPipeline() {
                     && old.showFullReleaseDate == new.showFullReleaseDate
                     && old.showImdbRatings == new.showImdbRatings
                     && old.localeTag == new.localeTag
-                    && old.catalogRows.size == new.catalogRows.size
+                    && old.catalogRows === new.catalogRows // TVFREAK: rehacer al llegar notas de MDBList, para verlas en los pósters
             }
             .debounce {
                 // Use a longer debounce while catalogs are still loading to

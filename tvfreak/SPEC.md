@@ -28,6 +28,8 @@ Rutas de código: todo cuelga de `app/src/main/java/com/nuvio/tv/`.
 
 La fila Seguir viendo no lleva notas: Nuvio no las carga ahí.
 
+Enganche extra (probado en la tele que hacía falta): Modern no rehace las tarjetas cuando solo llegan notas, porque compara el tamaño de `catalogRows`, no la lista. En `HomeViewModelPresentationPipeline.kt` (`distinctUntilChanged`) se compara la referencia de `catalogRows`, una línea `// TVFREAK`.
+
 **Ficha (Fase 3):** sin copia de `MetaDetailsContent`. Como mucho 2 o 3 enganches (contador "3 de 10 vistos", botón de marcar temporada), a decidir con la tele delante.
 
 **Textos e imágenes:** van en `app/src/full/res/` (el flavor que compilamos), que pisa a `main`. `app/src/main/res` vuelve a estar como en upstream. Solo `values` y `values-es`. Se arreglan también `trakt_awaiting_instruction` y `trakt_status_enter_activation_code`, que mandaban a trakt.tv. Se sustituyen el logo y el splash de Nuvio (`app_logo_wordmark*.png`, `app_logo_mark.png`).
