@@ -56,11 +56,21 @@ jobs:
             echo "NUVIO_RELEASE_KEY_ALIAS=tvfreak"
             echo "NUVIO_RELEASE_KEY_PASSWORD=${KEY_PASSWORD}"
             echo "NUVIO_RELEASE_STORE_PASSWORD=${KEY_PASSWORD}"
+            # Dolby Vision perfil 7 (como el Nuvio oficial). Las librerías ya están en DV7/libdovi
+            echo "DOVI_NATIVE_ENABLED=true"
+            echo "DOVI_EXTRACTOR_HOOK_READY=true"
+            echo "DOVI_ENABLE_REAL_LINK=true"
+            echo "DOVI_LIBDOVI_PREBUILT_ROOT=DV7/libdovi"
           } > local.properties
 
           # El actualizador de la app mira tus versiones, no las oficiales
           sed -i -E 's/("GITHUB_OWNER", "\\")NuvioMedia(\\"")/\1${{ github.repository_owner }}\2/' app/build.gradle.kts
           grep -n 'GITHUB_OWNER' app/build.gradle.kts
+          # Si Nuvio cambia esa línea, paramos en vez de compilar una app que mira las versiones oficiales
+          owner_line=$(grep 'GITHUB_OWNER' app/build.gradle.kts || true)
+          if [[ "${owner_line}" != *'${{ github.repository_owner }}'* || "${owner_line}" == *NuvioMedia* ]]; then
+            echo "No se pudo poner GITHUB_OWNER" >&2; exit 1
+          fi
 
           # Número de versión propio y creciente, para que la tele acepte cada actualización
           run="${{ github.run_number }}"
@@ -68,10 +78,14 @@ jobs:
           version="${base}.$((1000 + run))"
           sed -i -E "s/versionCode = [0-9]+/versionCode = $((100000 + run))/; s/versionName = \"[^\"]+\"/versionName = \"${version}\"/" app/build.gradle.kts
           grep -nE 'versionCode =|versionName =' app/build.gradle.kts
+          if ! grep -q "versionCode = $((100000 + run))" app/build.gradle.kts || ! grep -q "versionName = \"${version}\"" app/build.gradle.kts; then
+            echo "No se pudo poner la versión" >&2; exit 1
+          fi
           echo "TVFREAK_VERSION=${version}" >> "${GITHUB_ENV}"
 
       - name: Compilar
-        run: ./gradlew :app:assembleFullRelease --stacktrace
+        # Sin lint: ahorra 1 o 2 minutos y no cambia la app
+        run: ./gradlew :app:assembleFullRelease -x lintVitalAnalyzeFullRelease -x lintVitalReportFullRelease -x lintVitalFullRelease --stacktrace
 
       - name: Publicar la versión
         env:

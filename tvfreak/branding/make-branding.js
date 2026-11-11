@@ -129,6 +129,38 @@ function wordmarkVector() {
 `
 }
 
+// Logo de la app (sustituye app_logo_wordmark*.png, 1085x344, fondo transparente).
+// Nuvio elige la variante según el tema de colores.
+function appWordmarkSvg(colors) {
+  const w = 1085, h = 344, gap = 3
+  const totalW = SKULL_W + gap + WORD_W
+  const u = Math.min(w / totalW, h / SKULL_H)
+  const x0 = (w - totalW * u) / 2, y0 = (h - SKULL_H * u) / 2
+  const textY = (SKULL_H - WORD_H) / 2
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${defs('', colors)}
+    <g fill="url(#fg)">${svgRects(skullRects(0, 0), u, x0, y0)}</g>
+    <g fill="#ffffff">${svgRects(wordRects(SKULL_W + gap, textY), u, x0, y0)}</g></svg>`
+}
+
+// Splash (sustituye app_logo_mark.png, 1080x1080): calavera más pequeña, porque Android recorta en círculo
+function splashSvg(colors) {
+  const size = 1080, u = (size * 0.4) / SKULL_W
+  const x0 = (size - SKULL_W * u) / 2, y0 = (size - SKULL_H * u) / 2
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${defs('', colors)}
+    <rect width="${size}" height="${size}" fill="#0c0f1c"/>
+    <g fill="url(#fg)">${svgRects(skullRects(0, 0), u, x0, y0)}</g></svg>`
+}
+
+// Variantes del logo según el tema de Nuvio (ThemeBranding.kt)
+const THEME_WORDMARKS = {
+  '': VARIANTS[''],
+  _arctic_blue: VARIANTS._arctic_blue,
+  _graphite: VARIANTS._graphite,
+  _rose_gold: VARIANTS._rose_gold,
+  _jade: VARIANTS._emerald,
+  _gold: ['#ffe08a', '#d49a2a'],
+}
+
 function png(svg, file) {
   fs.mkdirSync(path.dirname(file), { recursive: true })
   fs.writeFileSync(file, new Resvg(svg).render().asPng())
@@ -145,6 +177,10 @@ const def = VARIANTS['']
 png(bannerSvg(1920, 1080, def), path.join(OUT, 'res/drawable-nodpi/tv_banner.png'))
 png(bannerSvg(1280, 720, def), path.join(OUT, 'res/drawable/tv_banner.png'))
 png(iconSvg(1080, def), path.join(OUT, 'res/drawable/ic_launcher.png'))
+for (const [suffix, colors] of Object.entries(THEME_WORDMARKS)) {
+  png(appWordmarkSvg(colors), path.join(OUT, `res/drawable-nodpi/app_logo_wordmark${suffix}.png`))
+}
+png(splashSvg(def), path.join(OUT, 'res/drawable-nodpi/app_logo_mark.png'))
 fs.mkdirSync(path.join(OUT, 'res/raw'), { recursive: true })
 fs.writeFileSync(path.join(OUT, 'res/raw/trakt_tv_favicon.svg'), glyphSvg(def))
 fs.writeFileSync(path.join(OUT, 'res/drawable/trakt_logo_wordmark.xml'), wordmarkVector())

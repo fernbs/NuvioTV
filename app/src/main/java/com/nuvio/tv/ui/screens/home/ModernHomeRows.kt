@@ -1516,6 +1516,8 @@ private fun ModernCarouselCard(
                             .zIndex(2f)
                     )
                 }
+                // TVFREAK: notas IMDb y RT en el póster
+                com.nuvio.tv.ui.screens.home.tvfreak.TvfreakRatingBadges(ratings = item.heroPreview.mdbListRatings ?: item.metaPreview?.mdbListRatings, modifier = Modifier.align(Alignment.TopStart).padding(start = NuvioTheme.spacing.sm, top = NuvioTheme.spacing.sm).zIndex(2f))
             }
         }
 

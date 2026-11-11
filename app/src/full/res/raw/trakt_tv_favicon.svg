@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="#151a33"/><stop offset="1" stop-color="#070912"/></radialGradient>
+    <linearGradient id="fg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b4a9ff"/><stop offset="1" stop-color="#6c5cf0"/></linearGradient>
+  </defs>
+    <rect width="48" height="48" rx="10" fill="url(#bg)"/>
+    <g fill="url(#fg)"><path shape-rendering="crispEdges" d="M15.6,8.600000000000001h16.799999999999997v3.3h-16.799999999999997zM12.8,11.400000000000002h22.4v3.3h-22.4zM10,14.200000000000001h28v3.3h-28zM10,17h28v3.3h-28zM10,19.8h5.6v3.3h-5.6zM18.4,19.8h11.2v3.3h-11.2zM32.4,19.8h5.6v3.3h-5.6zM10,22.6h2.8v3.3h-2.8zM21.2,22.6h5.6v3.3h-5.6zM35.2,22.6h2.8v3.3h-2.8zM10,25.4h5.6v3.3h-5.6zM18.4,25.4h11.2v3.3h-11.2zM32.4,25.4h5.6v3.3h-5.6zM10,28.2h28v3.3h-28zM10,31h11.2v3.3h-11.2zM26.799999999999997,31h11.2v3.3h-11.2zM10,33.8h28v3.3h-28zM12.8,36.6h5.6v3.3h-5.6zM21.2,36.6h5.6v3.3h-5.6zM29.599999999999998,36.6h5.6v3.3h-5.6z"/></g></svg>

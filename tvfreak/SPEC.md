@@ -1,6 +1,6 @@
 # TVFREAK dentro de NuvioTV: especificación
 
-Versión 0.2, 11 nov 2026. Aprobada, con colores y menús siempre desde los ajustes de Nuvio. Fork `fernbs/NuvioTV`, rama `dev`.
+Versión 0.3, 11 nov 2026. Aprobada. Tras la revisión de Fable: enganches en Modern en vez de copiarlo, y recursos propios en `app/src/full/res`. La sección "v0.3" manda sobre las secciones 1 a 9 cuando no coinciden. Fork `fernbs/NuvioTV`, rama `dev`.
 Diseño de referencia: artifact "Mi Nuvio con TVFREAK" (Inicio, menú de Seguir viendo, Ficha).
 
 Rutas de código: todo cuelga de `app/src/main/java/com/nuvio/tv/`.
@@ -11,13 +11,40 @@ Rutas de código: todo cuelga de `app/src/main/java/com/nuvio/tv/`.
 
 1. Nada por debajo de Nuvio. Toda función que Nuvio tiene sigue funcionando igual: reproductor, addons, Real-Debrid, sincronización, menús, ajustes.
 2. Solo se cambia cómo se ve y cómo se organiza. Los datos y las acciones son siempre los de Nuvio (sus ViewModel, repositorios y callbacks).
-3. Lo nuevo va en archivos nuevos con prefijo `Tvfreak`, en el paquete `ui/screens/home/tvfreak/` (y `ui/screens/detail/tvfreak/` si llega la Fase 3). Los archivos de Nuvio solo se tocan en las líneas listadas en la sección 6.
+3. Lo nuevo va en archivos nuevos con prefijo `Tvfreak`, en `ui/screens/home/tvfreak/`. En los archivos de Nuvio solo se añaden enganches de una línea marcados `// TVFREAK`. Textos e imágenes propios van en `app/src/full/res`, nunca en `app/src/main/res`.
 4. Todo lo que se pueda resolver con un ajuste dentro de la app no se programa.
 5. Los ajustes de Nuvio mandan. El diseño TVFREAK no fija colores ni menús: usa el tema que elijas en la app (incluido el Personalizado), la barra lateral que elijas (por ejemplo la moderna, flotante y oculta) y el resto de opciones de Nuvio. Solo cambia la colocación y la forma de los elementos. Las únicas excepciones son los colores de marca de IMDb (amarillo) y Rotten Tomatoes (rojo y verde) en las notas.
 
 ---
 
-## 1. Decisión de arquitectura que necesito que apruebes
+## v0.3. Cambios tras la revisión de Fable (mandan sobre lo de abajo)
+
+**Inicio: enganches en Modern, sin copia.** Modern ya tiene hero arriba, notas MDBList en el hero y tarjeta de Seguir viendo 16:9 con progreso, minutos restantes y chip de nuevo (estilo "CARD" en ajustes). Copiar sus 4.244 líneas congelaría unos 28 ajustes y se quedaría atrás (unos 25 cambios por trimestre en upstream). Se descartan: `TvfreakHomeContent/Hero/Rows/RowsList`, `TvfreakContinueWatchingCard`, la preferencia `tvfreak_skin` y el interruptor. Lo único que se añade:
+
+| Elemento | Cómo | Archivos |
+|---|---|---|
+| Notas IMDb y RT en cada póster de catálogo | `ui/screens/home/tvfreak/TvfreakRatingBadges.kt` (nuevo), llamado desde el Box de la imagen de `ModernCarouselCard`, en la esquina superior izquierda (la derecha es del check de visto) | `ModernHomeRows.kt`, 1 a 3 líneas `// TVFREAK` |
+| Datos | `item.heroPreview.mdbListRatings`, que Nuvio ya rellena por lotes con "mostrar en el hero" activado | Ninguno |
+
+La fila Seguir viendo no lleva notas: Nuvio no las carga ahí.
+
+**Ficha (Fase 3):** sin copia de `MetaDetailsContent`. Como mucho 2 o 3 enganches (contador "3 de 10 vistos", botón de marcar temporada), a decidir con la tele delante.
+
+**Textos e imágenes:** van en `app/src/full/res/` (el flavor que compilamos), que pisa a `main`. `app/src/main/res` vuelve a estar como en upstream. Solo `values` y `values-es`. Se arreglan también `trakt_awaiting_instruction` y `trakt_status_enter_activation_code`, que mandaban a trakt.tv. Se sustituyen el logo y el splash de Nuvio (`app_logo_wordmark*.png`, `app_logo_mark.png`).
+
+**Workflow:** activar Dolby Vision perfil 7 (`DOVI_*` como en `local.example.properties`), saltar lint vital en el release, y que los `sed` fallen si no encuentran la línea.
+
+**Worker:** bloqueo del código tras 5 PIN fallidos en `/activate`.
+
+**Ajustes en la tele (sin código):** apagar los comentarios (el worker no devuelve reseñas), MDBList con clave propia y "mostrar en el hero" activado, estilo "CARD" en Seguir viendo.
+
+**Pendiente apuntado:** el worker rellena `imdbRating` con la nota de TMDB en las sugerencias (`worker.js:183`). IntroDB y cuenta Nuvio no se activan (sus claves no son públicas).
+
+**Actualizaciones de Nuvio:** merge semanal de `upstream/dev` (no rebase), con `rerere` activado, y tras cada merge contar los `// TVFREAK` para comprobar que no se ha perdido ningún enganche.
+
+---
+
+## 1. Decisión de arquitectura (v0.2, sustituida en parte por v0.3)
 
 **Propuesta: TVFREAK como "piel" de Modern, no como cuarto valor del enum.**
 
