@@ -44,7 +44,17 @@ Propuesta v0.3.1 (pendiente de tu OK):
 
 **Filas del addon (11 nov):** Series viendo, Series pendientes (apuntadas sin ningún capítulo visto), Al día, Series vistas, Películas viendo (a medias en la tele, la web no tiene ese estado), Películas pendientes, Películas vistas, más Sugerencias, Para volver a ver y Abandonadas. El orden y las filas ocultas se eligen en la tele: Ajustes > Addons > "Reordenar catálogos del inicio". Índices en `watchedEpisodes(watchedAt)` y `movies(status, updatedAt)` para no agotar las lecturas gratis de D1.
 
-**Listas propias (pendiente, chat nuevo):** el worker implementa la parte de listas de Trakt (`users/{id}/lists` y sus `items`) con tablas propias en D1, para que "Crear lista" y "Añadir a lista" de Nuvio funcionen, y publica cada lista como una fila más del addon para que salga en el Inicio.
+**Listas propias (12 nov, solo películas):** listas temporales, por ejemplo "Navidad" para las vacaciones, que luego se borran. El worker implementa la parte de listas de Trakt que usa Nuvio (`users/{id}/lists`: ver, crear, editar, borrar, reordenar, y sus `items`: ver, añadir, quitar) con dos tablas propias en D1:
+- `tv_lists`: id, nombre, descripción, privacidad, orden, creada, actualizada.
+- `tv_list_items`: lista, tmdbId, imdbId, título, año, póster, sinopsis, orden, fecha. Clave (lista, tmdbId).
+Reglas:
+- Solo películas. Si añades una serie, el worker responde 0 añadidas y Nuvio enseña su error de "no se pudo añadir".
+- Añadir a una lista no toca la biblioteca (tabla `movies`) ni ningún estado de la web.
+- Al añadir, el worker pide a TMDB los datos una sola vez y los guarda, así la fila no llama a TMDB.
+- "Eliminar lista" en la tele borra la lista y sus items de verdad. Las películas de la biblioteca no se tocan.
+- Cada lista con alguna película sale como fila del addon `tvf_list_<id>` (tipo película, con el nombre de la lista). Una lista vacía no sale. Nuvio relee el manifiesto cada 6 horas, o al momento con "actualizar" en Ajustes > Addons.
+- La web TVFREAK no ve estas listas, son solo de la tele.
+Watchsomuch: descartado.
 
 **Ajustes en la tele (sin código):** apagar los comentarios (el worker no devuelve reseñas), MDBList con clave propia y "mostrar en el hero" activado, estilo "CARD" en Seguir viendo.
 
