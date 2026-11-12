@@ -61,6 +61,7 @@ Reglas:
 - Al añadir desde la web, la propia web manda tmdbId, imdbId (lo pide a TMDB si no lo tiene), título, año, póster y sinopsis. Sin imdbId la película no sale en la fila de la tele, así que la web avisa si no lo encuentra.
 - Ficha de película: botón "Add to list" que abre una hoja con tus listas (marcadas las que ya la tienen) y "New list". Sirve igual para películas de la biblioteca o de la búsqueda, y no toca su estado.
 - Biblioteca, modo películas: una fila de chips con las listas. Al elegir una, se ven sus películas. Desde el chip se renombra o se borra la lista.
+- Inicio, pestaña "Watching now": cada lista con películas sale como una sección con su nombre, debajo de las series. Las películas de una lista ya no salen en la sección general "Films", se ven solo en la de su lista (en todas sus listas si está en varias). La sección enseña todas las películas de la lista, estén o no en la biblioteca. Una papelera junto al nombre borra la lista (pide confirmación), y sus películas vuelven a "Films" si les toca. El estado de la película no cambia, así que en la tele sigue saliendo también en "Películas pendientes". Todo se lee con una sola llamada, `GET /api/lists/items` (todas las películas de todas las listas, con su `listId`).
 - Textos en inglés, como el resto de la web.
 - En la tele: lo añadido a una lista que ya tiene fila sale en unos 2 minutos. Una lista nueva sale como fila cuando Nuvio relee el manifiesto (hasta 6 horas, o al momento con "actualizar" en Ajustes > Addons).
 
