@@ -53,7 +53,17 @@ Reglas:
 - Al añadir, el worker pide a TMDB los datos una sola vez y los guarda, así la fila no llama a TMDB.
 - "Eliminar lista" en la tele borra la lista y sus items de verdad. Las películas de la biblioteca no se tocan.
 - Cada lista con alguna película sale como fila del addon `tvf_list_<id>` (tipo película, con el nombre de la lista). Una lista vacía no sale. Nuvio relee el manifiesto cada 6 horas, o al momento con "actualizar" en Ajustes > Addons.
-- La web TVFREAK no ve estas listas, son solo de la tele.
+- La web TVFREAK ve y edita las mismas listas (12 nov). Las listas son las mismas en los dos sitios, no hay copia ni sincronización.
+
+**Listas en la web (12 nov, solo películas):**
+- Tablas: las mismas `tv_lists` y `tv_list_items` de la base `tvfreak`. La web las crea con la migración `0004_lists.sql` (`CREATE TABLE IF NOT EXISTS`, mismo esquema que el worker de la tele), así la instancia de Alfon no se rompe si algún día recibe el código.
+- Rutas nuevas en `tvfreak-worker`: `GET /api/lists` (con número de películas), `POST /api/lists` (crear), `PATCH /api/lists/:id` (renombrar), `DELETE /api/lists/:id` (borra la lista y sus películas, pide confirmación en la web), `GET /api/lists/:id/items`, `POST /api/lists/:id/items` (añadir), `DELETE /api/lists/:id/items/:tmdbId` (quitar). Cada cambio actualiza `tv_lists.updatedAt`.
+- Al añadir desde la web, la propia web manda tmdbId, imdbId (lo pide a TMDB si no lo tiene), título, año, póster y sinopsis. Sin imdbId la película no sale en la fila de la tele, así que la web avisa si no lo encuentra.
+- Ficha de película: botón "Add to list" que abre una hoja con tus listas (marcadas las que ya la tienen) y "New list". Sirve igual para películas de la biblioteca o de la búsqueda, y no toca su estado.
+- Biblioteca, modo películas: una fila de chips con las listas. Al elegir una, se ven sus películas. Desde el chip se renombra o se borra la lista.
+- Textos en inglés, como el resto de la web.
+- En la tele: lo añadido a una lista que ya tiene fila sale en unos 2 minutos. Una lista nueva sale como fila cuando Nuvio relee el manifiesto (hasta 6 horas, o al momento con "actualizar" en Ajustes > Addons).
+
 Watchsomuch: descartado.
 
 **Ajustes en la tele (sin código):** apagar los comentarios (el worker no devuelve reseñas), MDBList con clave propia y "mostrar en el hero" activado, estilo "CARD" en Seguir viendo.
