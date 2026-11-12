@@ -52,7 +52,7 @@ Reglas:
 - Añadir a una lista no toca la biblioteca (tabla `movies`) ni ningún estado de la web.
 - Al añadir, el worker pide a TMDB los datos una sola vez y los guarda, así la fila no llama a TMDB.
 - "Eliminar lista" en la tele borra la lista y sus items de verdad. Las películas de la biblioteca no se tocan.
-- Cada lista con alguna película sale como fila del addon `tvf_list_<id>` (tipo película, con el nombre de la lista). Una lista vacía no sale. Nuvio relee el manifiesto cada 6 horas, o al momento con "actualizar" en Ajustes > Addons.
+- Cada lista con alguna película sale como fila del addon `tvf_list_<id>` (tipo película, con el nombre de la lista). Una lista vacía no sale. Nuvio relee el manifiesto cada 6 horas, al abrir la app, o al momento con "actualizar" en Ajustes > Addons. El worker sirve el manifiesto con caché de 5 minutos (antes 1 hora), así al abrir la app ya llega la lista nueva. Si ya ordenaste las filas, Nuvio pone las nuevas al final del Inicio y hay que subirlas en "Reordenar catálogos del inicio".
 - La web TVFREAK ve y edita las mismas listas (12 nov). Las listas son las mismas en los dos sitios, no hay copia ni sincronización.
 
 **Listas en la web (12 nov, solo películas):**
